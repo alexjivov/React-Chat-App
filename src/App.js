@@ -14,6 +14,54 @@ import './App.css';
 
 
 class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      currentRoomID: null,
+      joinableRooms: [],
+      joinedRooms: [],
+      messages: []
+    }
+    this.subscribeToRoom = this.subscribeToRoom.bind(this)
+    this.sendMessage = this.sendMessage.bind(this)
+    this.subscribeToRoom = this.subscribeToRoom.bind(this)
+  }
+
+  componentDidMount () {
+    const chatManager = new Chatkit.ChatManager ({
+      instanceLocator: instanceLocator,
+      userId: "ajivov",
+      tokenProvider: new Chatkit.TokenProvider({
+        url: tokenUrl
+      })
+    })
+
+    chatManager.connect()
+    .then(currenUser => {
+      this.currentUser = this.currentUser
+      return this.currentUser.getJoinableRooms()
+      .then(joinableRooms => {
+        this.setState({
+          joinableRooms,
+          joinedRooms: this.currentUser.rooms
+        })
+      })
+    })
+    .catch(err => console.log('error connecting', err))
+  }
+
+  sendMessage(text) {
+    this.currentUser.sendMessage({
+      text,
+      roomId: this.state.currentRoomID
+    })
+  }
+
+  createRoom(name) {
+    this.currentUser.createRoom({
+      
+    })
+  }
   render() {
     return (
       <div className="App">
