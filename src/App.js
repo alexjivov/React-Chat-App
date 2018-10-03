@@ -59,9 +59,40 @@ class App extends Component {
 
   createRoom(name) {
     this.currentUser.createRoom({
-      
+      name
     })
+    .then(room => this.subscribeToRoom(room.id))
+    .catch(err => console.log(err))
   }
+
+  subscribeToRoom(roomId) {
+    this.setState({
+      message: []
+    });
+    this.currentUser.subscribeToRoom({
+      roomId: roomId,
+      hooks: {
+        onNewMessage: message => {
+          this.setState({
+            messages: [...this.state.messages, message]
+          })
+        }
+      }
+    })
+    .then(currentRoom => {
+      this.setState({currentRoomId: currentRoom.id})
+      return this.currentUser.getJoinableRooms()
+      .then(joinableRooms => {
+        this.setState({
+          joinableRooms,
+          joinedRooms: this.currentUser.rooms
+        })
+      })
+    })
+    .catch(err => console.log('error on subscribing', err))
+  }
+
+  
   render() {
     return (
       <div className="App">
